@@ -86,18 +86,18 @@ func getStatus(status git.StatusCode) string {
 	}
 }
 
-func FetchGitStatus() (untracked []string, modified, staged map[string]string, err error) {
+func FetchGitStatus() (untracked []string, modified, staged map[string]string, e error) {
 	if repo == nil {
 		return
 	}
 	w, err := repo.Worktree()
 	if err != nil {
-		return
+		return untracked, modified, staged, err
 	}
 
 	status, err := w.Status()
 	if err != nil {
-		return
+		return untracked, modified, staged, err
 	}
 	if status.IsClean() {
 		return
