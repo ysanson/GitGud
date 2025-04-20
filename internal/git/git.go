@@ -62,3 +62,59 @@ func ReadLogs(hash plumbing.Hash) (string, error) {
 	})
 	return str.String(), nil
 }
+
+func getStatus(status git.StatusCode) string {
+	switch status {
+	case git.Unmodified:
+		return "Unmodified"
+	case git.Untracked:
+		return "Untracked"
+	case git.Modified:
+		return "Modified"
+	case git.Added:
+		return "Added"
+	case git.Deleted:
+		return "Deleted"
+	case git.Renamed:
+		return "Renamed"
+	case git.Copied:
+		return "Copied"
+	case git.UpdatedButUnmerged:
+		return "UpdatedButUnmerged"
+	default:
+		return "Unknown"
+	}
+}
+
+func FetchGitStatus() (untracked []string, modified, staged map[string]string, err error) {
+	if repo == nil {
+		return
+	}
+	w, err := repo.Worktree()
+	if err != nil {
+		return
+	}
+
+	status, err := w.Status()
+	if err != nil {
+		return
+	}
+	if status.IsClean() {
+		return
+	}
+
+	modified = make(map[string]string)
+	staged = make(map[string]string)
+
+	for path, s := range status {
+		switch {
+		case s.Worktree == git.Untracked:
+			untracked = append(untracked, path)
+		case s.Staging != git.Unmodified:
+			staged[path] = getStatus(s.Staging)
+		case s.Worktree != git.Unmodified:
+			modified[path] = getStatus(s.Worktree)
+		}
+	}
+	return
+}

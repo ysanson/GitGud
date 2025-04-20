@@ -12,6 +12,12 @@ type InitState struct {
 	Logs     string
 }
 
+type StatusState struct {
+	Untracked []string
+	Modified  map[string]string
+	Staged    map[string]string
+}
+
 type LogsMsg string
 
 type ErrMsg struct{ err error }
@@ -49,4 +55,16 @@ func FetchInit() tea.Msg {
 		return ErrMsg{err: err}
 	}
 	return InitState{Branches: branches, Logs: logs}
+}
+
+func FetchStatus() tea.Msg {
+	if err := openGit(); err != nil {
+		fmt.Printf("Error: not a git repository")
+		return ErrMsg{err: err}
+	}
+	untracked, modified, staged, err := git.FetchGitStatus()
+	if err != nil {
+		return ErrMsg{err: err}
+	}
+	return StatusState{Untracked: untracked, Modified: modified, Staged: staged}
 }
