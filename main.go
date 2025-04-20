@@ -25,12 +25,12 @@ type model struct {
 }
 
 func (m model) Init() tea.Cmd {
-	return ui.FetchInit
+	return ui.GetGitStatus()
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case ui.InitState:
+	case ui.LogsState:
 		m.branches = msg.Branches
 		m.logs = msg.Logs
 	case ui.LogsMsg:
@@ -46,6 +46,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "tab":
 			m.currentTab = (m.currentTab + 1) % 2
+			if m.currentTab == 0 {
+				return m, ui.GetGitStatus()
+			} else if m.currentTab == 1 {
+				return m, ui.FetchInit
+			}
 		case "q":
 			return m, tea.Quit
 		case "up":
