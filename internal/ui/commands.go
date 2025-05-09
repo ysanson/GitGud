@@ -14,8 +14,8 @@ type LogsState struct {
 
 type StatusState struct {
 	Untracked []string
-	Modified  map[string]string
-	Staged    map[string]string
+	Modified  map[string]rune
+	Staged    map[string]rune
 }
 
 type LogsMsg string

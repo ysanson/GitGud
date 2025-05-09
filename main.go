@@ -10,7 +10,7 @@ import (
 	"github.com/ysanson/GitGud/internal/ui"
 )
 
-type fileStatus map[string]string
+type fileStatus map[string]rune
 
 type model struct {
 	branches   []git.Branch
@@ -76,8 +76,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) statusView() string {
 	style := lipgloss.NewStyle().Underline(true)
-	untrTitle := style.Render("Untracked:\n\n")
-	modifTitle := style.Render("Modified:\n\n")
+	untrTitle := style.Foreground(lipgloss.Color("#E02611")).Render("Untracked:\n\n")
+	modifTitle := style.Foreground(lipgloss.Color("#FF8B00")).Render("Modified:\n\n")
 	stagedTitle := style.Foreground(lipgloss.Color("#ACD8A9")).Render("Staged:\n\n")
 	var untracked strings.Builder
 	if len(m.untracked) == 0 {
@@ -87,13 +87,14 @@ func (m model) statusView() string {
 			untracked.WriteString("- " + f + "\n")
 		}
 	}
-	status := func(files map[string]string) string {
+	status := func(files map[string]rune) string {
 		var sb strings.Builder
 		if len(files) == 0 {
 			sb.WriteString("(no files)")
 		} else {
 			for path, status := range files {
-				sb.WriteString("- " + path + ": " + status + "\n")
+				sb.WriteRune(status)
+				sb.WriteString(" " + path + "\n")
 			}
 		}
 		return sb.String()

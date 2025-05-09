@@ -63,30 +63,30 @@ func ReadLogs(hash plumbing.Hash) (string, error) {
 	return str.String(), nil
 }
 
-func getStatus(status git.StatusCode) string {
+func getStatus(status git.StatusCode) rune {
 	switch status {
 	case git.Unmodified:
-		return "Unmodified"
+		return '~'
 	case git.Untracked:
-		return "Untracked"
+		return 'U'
 	case git.Modified:
-		return "Modified"
+		return 'M'
 	case git.Added:
-		return "Added"
+		return '+'
 	case git.Deleted:
-		return "Deleted"
+		return '-'
 	case git.Renamed:
-		return "Renamed"
+		return 'R'
 	case git.Copied:
-		return "Copied"
+		return 'C'
 	case git.UpdatedButUnmerged:
-		return "UpdatedButUnmerged"
+		return '*'
 	default:
-		return "Unknown"
+		return '?'
 	}
 }
 
-func FetchGitStatus() (untracked []string, modified, staged map[string]string, e error) {
+func FetchGitStatus() (untracked []string, modified, staged map[string]rune, e error) {
 	if repo == nil {
 		return
 	}
@@ -103,8 +103,8 @@ func FetchGitStatus() (untracked []string, modified, staged map[string]string, e
 		return
 	}
 
-	modified = make(map[string]string)
-	staged = make(map[string]string)
+	modified = make(map[string]rune)
+	staged = make(map[string]rune)
 
 	for path, s := range status {
 		switch {
